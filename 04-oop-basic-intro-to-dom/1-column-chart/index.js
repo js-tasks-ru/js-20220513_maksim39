@@ -33,7 +33,7 @@ export default class ColumnChart {
                     ${link}
                 </div>
                 <div class="column-chart__container">
-                    <div data-element="header" class="column-chart__header">${this.props.formatHeading(this.props.value)}</div>
+                    <div data-element="header" class="column-chart__header">${this.props.formatHeading(this.props.value.toLocaleString('en-US'))}</div>
                     <div data-element="body" class="column-chart__chart"></div>
                 </div>
             </div>
