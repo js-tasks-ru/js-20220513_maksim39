@@ -58,18 +58,14 @@ export default class SortableTable {
       .join("");
   }
 
-  omit(obj, ...fields) {
-    return Object.fromEntries(Object.entries(obj).filter(item => !fields.includes(item[0])));
-  }
-
   getColumnItems(dataElement) {
     const result = [];
-    if (this.headerConfig.images) {
-      result.push(this.headerConfig.images.template(dataElement.images));
-    }
-    for (const key in this.omit(this.headerConfig, "images")) {
-      const value = dataElement[key];
-      if (value) {
+    for (const key in this.headerConfig) {
+      const template = this.headerConfig[key].template;
+      if (template) {
+        result.push(template(dataElement[key]));
+      } else {
+        const value = dataElement[key] !== undefined ? dataElement[key] : '';
         result.push(`<div class="sortable-table__cell">${value}</div>`);
       }
     }
