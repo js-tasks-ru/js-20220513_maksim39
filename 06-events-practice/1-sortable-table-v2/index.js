@@ -1,7 +1,7 @@
 export default class SortableTable {
   subElements = {};
   sortData = this.createSortData();
-  listenerContainers = [];
+  mouseListener = this.createMouseListener();
 
   constructor(
     headerConfig = [],
@@ -132,27 +132,28 @@ export default class SortableTable {
   }
 
   initEventListeners() {
-    const createMouseListener = this.createMouseListenerFn();
-    const sortableColumns = Array.from(this.subElements.header.children).filter(item => item.dataset.sortable);
-    sortableColumns.forEach(item => {
-      const mouseListener = createMouseListener(item);
-      item.addEventListener("pointerdown", mouseListener);
-      this.listenerContainers.push({element: item, listener: mouseListener});
-    });
+    this.subElements.header.addEventListener("pointerdown", this.mouseListener);
   }
 
-  createMouseListenerFn() {
+  createMouseListener() {
     const nextOrderObj = {
       asc: 'desc',
       desc: 'asc'
     };
-    return (element) => {
-      return () => {
-        const field = element.dataset.id;
-        const nextOrder = nextOrderObj[element.dataset.order];
-        element.dataset.order = nextOrder;
-        this.sort(field, nextOrder);
-      };
+    return event => {
+      const target = event.target.closest('div');
+      if (!target) {
+        return;
+      }
+      const dataset = target.dataset;
+      const field = dataset.id;
+      const order = dataset.order;
+      if (!field || !order) {
+        return;
+      }
+      const nextOrder = nextOrderObj[order];
+      dataset.order = nextOrder;
+      this.sort(field, nextOrder);
     };
   }
 
@@ -162,9 +163,7 @@ export default class SortableTable {
 
   destroy() {
     this.remove();
-    this.listenerContainers.forEach(container => {
-      container.element.removeEventListener("pointerdown", container.listener);
-    });
+    this.subElements.header.removeEventListener("pointerdown", this.mouseListener);
   }
 }
 
